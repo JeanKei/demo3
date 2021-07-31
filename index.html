@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing Room VR</title>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+    <!-- Library of Virtual Reality -->
+    <script type="text/javascript" charset="UTF-8" src="./libs/aframe-master.js"></script>
+    <script type="text/javascript" charset="UTF-8" src="./libs/orbi.js"></script>
+
+    <script>
+        AFRAME.registerComponent('config', {
+            init: function () {
+                const self = this;
+
+                this.isMoving = false;
+                this.timeSum = 0;
+                this.times = [0, 0, 0];
+                this.distances = [0, 0, 0];
+                this.timeIdx = 0;
+                this.horizontalTurns = 2;
+                this.verticalTurns = 0;
+
+                this.arrow = document.querySelector('#arrow').object3D;
+
+                const messages = [
+                    `OrBI é uma interface com usuário pensada para realidade virtual.
+                    OrBI é posicionada em relação ao usuário e pode ser movida dentro de uma esfera imaginária,
+                    como no exemplo à direita.`,
+                    `Nesse teste, será pedido para posicionar interface em algumas posições difertentes para se avaliar a precisão da OrBI e sua facilade
+                    de uso.
+                    Clique em próximo para continuar começar.`
+                ]
+                let msgIndex = 0;
+
+                const vrInterface = this.el.components['orbi'];
+                this.testInterface = document.querySelector('#example').components['orbi'];
+
+                // vrInterface.addButton('next', '#next', () => {
+                //     msgIndex++;
+                //     if (msgIndex < 2) {
+                //         vrInterface.showSideText(messages[msgIndex]);
+                //     }
+                //     else if (msgIndex === 2) {
+                //         vrInterface.hide();
+                //         self.testInterface.showMessage('Mova a interface para direita')
+
+                //         self.isToAnimateMan = false;
+                //         self.verticalTurns = 0;
+                //         self.horizontalTurns = 0;
+                //         self.testInterface.el.object3D.rotation.y = 0;
+                //         self.testInterface.buttonGroup.object3D.rotation.x = 0;
+
+                //         self.rig.setAttribute('position', '0 0 0');
+
+                //         manEl.object3D.visible = false;
+
+                //         function fadeOut() {
+                //             if (sphereWireframe.material.opacity > 0) {
+                //                 sphereWireframe.material.opacity -= 0.1;
+                //             }
+
+                //             setTimeout(fadeOut, 100);
+                //         }
+                //         fadeOut();
+                //         // self.arrow.visible = true;
+                //     }
+                // });
+                // vrInterface.showSideText(messages[0]);
+
+                // this.testInterface.addButton('b1', '#b1', () => { vrInterface.showMessage('button 1') });
+                // this.testInterface.addButton('b2', '#b2');
+                // this.testInterface.addButton('b3', '#b3');
+                // this.testInterface.addButton('b4', '#b4');
+                // this.auxPosition = new THREE.Vector3();
+
+                // const sphereEdges = new THREE.EdgesGeometry(new THREE.SphereGeometry(1.1, 18, 18));
+                // const sphereWireframe = new THREE.LineSegments(sphereEdges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true }));
+                // sphereWireframe.position.y = 1.6;
+                // this.el.sceneEl.setObject3D("sphere", sphereWireframe);
+
+                // this.squareLocations = [
+                //     { position: new THREE.Vector3(1, 1.6, 0), rotation: new THREE.Euler(0, Math.PI / 2, 0) },
+                //     { position: new THREE.Vector3(Math.cos(Math.PI / 6) * 1.5, 1.6 + 0.75, 0), rotation: new THREE.Euler(0.52, -Math.PI / 2, 0, 'YXZ') },
+                //     { position: new THREE.Vector3(0, 1.6, -1.5), rotation: new THREE.Euler(0, 0, 0) },
+                // ];
+                // const squareEdges = new THREE.EdgesGeometry(new THREE.PlaneGeometry(0.5625, 0.5625))
+                // this.square = new THREE.LineSegments(squareEdges, new THREE.LineBasicMaterial({ color: 0xff0000 }));
+                // this.square.position.copy(this.squareLocations[0].position);
+                // this.square.rotation.copy(this.squareLocations[0].rotation);
+                // // this.el.sceneEl.setObject3D('square', this.square);
+
+                // const squareClone = new THREE.LineSegments(squareEdges, new THREE.LineBasicMaterial({ color: 0xff0000 }));
+                // squareClone.scale.set(0.77, 0.77, 0.77);
+                // this.square.add(squareClone);
+
+                // this.movementsRemaining = 1;
+
+                const startMoving = () => {
+                    self.isMoving = self.timeIdx < 3;
+                }
+
+                const stopMoving = () => {
+                    // self.isMoving = false;
+
+                    // let theta = self.testInterface.data.theta;
+                    // let phi = self.testInterface.data.phi;
+
+                    // const x = -Math.sin(theta) * Math.cos(phi) * self.testInterface.radius;
+                    // const y = 1.6 + Math.sin(phi) * self.testInterface.radius;
+                    // const z = -Math.cos(theta) * Math.cos(phi) * self.testInterface.radius;
+
+                    // self.distances[self.timeIdx] = new THREE.Vector3(x, y, z).distanceTo(self.square.position);
+
+                    // self.timeIdx += 1;
+                    // if (self.timeIdx === 3) {
+                    //     // sendData();
+                    //     self.square.visible = false;
+                    //     self.movementsRemaining = -1;
+                    // }
+                    // else {
+                    //     self.movementsRemaining = 2;
+
+                    //     self.arrow.rotation.y = -Math.PI * 0.5;
+                    //     self.arrow.rotation.z = 1.5 * self.arrow.rotation.z + Math.PI * 0.5;
+                    //     self.arrow.position.copy(self.square.position);
+                    //     self.arrow.position.z -= 0.5;
+
+                    //     self.square.position.copy(self.squareLocations[self.timeIdx].position);
+                    //     self.square.rotation.copy(self.squareLocations[self.timeIdx].rotation);
+
+                    //     self.square.material.color.r = 1;
+                    //     self.square.material.color.g = 0;
+                    // }
+
+                }
+
+                // const movementUpdate = () => {
+                //     self.movementsRemaining--;
+
+                //     if (self.movementsRemaining === 0) {
+                //         stopMoving();
+                //     }
+                // }
+
+                // this.testInterface.horizMovButtonCallback = startMoving;
+                // this.testInterface.vertiMovButtonCallback = startMoving;
+                // this.testInterface.stopButtonCallback = movementUpdate;
+                // this.testInterface.orbitButtonCallback = () => {
+                //     if (!self.isMoving) {
+                //         self.isMoving = true;
+                //     }
+                //     movementUpdate();
+                // }
+
+                // const manEl = document.querySelector('#man');
+                // this.isToAnimateMan = false;
+
+                // manEl.addEventListener('model-loaded', () => {
+                //     self.head = manEl.object3D.children[0].children[5];
+                //     self.isToAnimateMan = true;
+
+                //     self.rig = document.querySelector('#rig');
+                //     self.rig.setAttribute('position', '-2 0 2');
+                //     vrInterface.updatePosition();
+                // });
+
+                function sendData() {
+                    // document.querySelector("#d1").value = self.distances[0];
+                    // document.querySelector("#d2").value = self.distances[1];
+                    // document.querySelector("#d3").value = self.distances[2];
+
+                    // document.querySelector("#t1").value = self.times[0];
+                    // document.querySelector("#t2").value = self.times[1];
+                    // document.querySelector("#t3").value = self.times[2];
+                    // document.getElementById("gform").submit();
+                }
+            },
+            tick: function (time, delta) {
+                // if (this.isToAnimateMan) {
+                //     this.manAnimation(delta);
+                // }
+
+                // if (this.isMoving) {
+                //     this.times[this.timeIdx] += delta * 0.001;
+                //     this.testInterface.buttons[0].getWorldPosition(this.auxPosition);
+                //     this.auxPosition.x += 0.1;
+                //     this.auxPosition.y -= 0.1;
+
+                //     if (this.auxPosition.distanceToSquared(this.square.position) < 0.04) {
+                //         if (this.square.material.color.r = 1) {
+                //             this.square.material.color.r = 0;
+                //             this.square.material.color.g = 1;
+                //         }
+                //     }
+                //     else if (this.square.material.color.g = 1) {
+                //         this.square.material.color.r = 1;
+                //         this.square.material.color.g = 0;
+                //     }
+                // }
+            },
+            manAnimation: function (delta) {
+                // if (this.horizontalTurns > 0) {
+                //     this.timeSum += delta * 0.001
+                //     this.head.rotation.y = Math.sin(this.timeSum);
+                //     this.testInterface.el.object3D.rotation.y = this.head.rotation.y;
+
+                //     if (this.head.rotation.y < 0.01 && this.head.rotation.y > -0.01) {
+                //         this.horizontalTurns -= 1;
+
+                //         if (this.horizontalTurns == 0) {
+                //             this.verticalTurns = 2;
+                //         }
+                //     }
+                // }
+                // else if (this.verticalTurns > 0) {
+                //     this.timeSum += delta * 0.001
+                //     this.head.rotation.x = Math.sin(this.timeSum);
+                //     this.testInterface.buttonGroup.object3D.rotation.x = this.head.rotation.x;
+
+                //     if (this.head.rotation.x < 0.01 && this.head.rotation.x > -0.01) {
+                //         this.verticalTurns -= 1;
+
+                //         if (this.verticalTurns == 0) {
+                //             this.horizontalTurns = 2;
+                //         }
+                //     }
+                // }
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <a-scene main_scene id="scene" renderer="colorManagement: true;" background="color: #343434">
+        <a-assets>
+            <a-asset-item id="model_1" src="./assets/models/1.glb"></a-asset-item>
+            <a-asset-item id="model_2" src="./assets/models/2.glb"></a-asset-item>
+            <a-asset-item id="model_3" src="./assets/models/3.glb"></a-asset-item>
+            <a-asset-item id="model_4" src="./assets/models/4.glb"></a-asset-item>
+            <a-asset-item id="model_5" src="./assets/models/5.glb"></a-asset-item>
+            <a-asset-item id="model_6" src="./assets/models/6.glb"></a-asset-item>
+            <a-asset-item id="model_7" src="./assets/models/7.glb"></a-asset-item>
+            <a-asset-item id="model_8" src="./assets/models/8.glb"></a-asset-item>
+            <a-asset-item id="model_9" src="./assets/models/9.glb"></a-asset-item>
+
+            <img id="next" src="img/next-br.png">
+            <img id="b1" src="img/action1.png">
+            <img id="b2" src="img/action2.png">
+            <img id="b3" src="img/action3.png">
+            <img id="b4" src="img/action4.png">
+            <img id="arrowTexture" src="img/arrow.png">
+
+            <img id="wallText" src="./assets/textures/white-wall.png">
+            <img id="wood" src="./assets/textures/wood3.jpg">
+        </a-assets>
+
+        <a-entity id="1model" gltf-model="#model_1" position="4.5 0 0" scale="8 8 8"></a-entity>
+
+        <a-entity id="2model" gltf-model="#model_2" position="2 0 4" scale="2 2 2"></a-entity>
+
+        <a-entity id="3model" gltf-model="#model_3" position="3 0 -4" scale="3 3 3"></a-entity>
+
+        <a-entity id="4model" gltf-model="#model_4" position="3 0 3" scale="6 6 6"></a-entity>
+
+        <a-entity id="5model" gltf-model="#model_5" position="-4.5 0 2" scale="5 5 5"></a-entity>
+
+        <a-entity id="6model" gltf-model="#model_6" position="-4.5 0 -4.5" scale="4 4 4"></a-entity>
+
+        <a-entity id="7model" gltf-model="#model_7" position="-2 0 4" scale="5 5 5"></a-entity>
+
+        <a-entity id="8model" gltf-model="#model_8" position="2 1 -3" scale="4 4 4"></a-entity>
+
+        <a-entity id="9model" gltf-model="#model_9" position="1 0 -4" scale="3 3 3"></a-entity>
+
+        <a-entity light="type: ambient; color: #fff; intensity: 0.3"></a-entity>
+        <a-entity light="color: #fff" position="-15 110 30"></a-entity>
+
+        <a-plane id="floor" rotation="-90 0 0" material="src: #wood; repeat: 3 3" height="10" width="10"></a-plane>
+
+        <a-plane id="wall-1" rotation="0 0 0" position="0 0.5 -5" material="src: #wallText;" height="1" width="10">
+        </a-plane>
+        <a-plane id="wall-2" rotation="0 180 0" position="0 0.5 5" material="src: #wallText;" height="1" width="10">
+        </a-plane>
+        <a-plane id="wall-3" rotation="0 90 0" position="-5 0.5 0" material="src: #wallText;" height="1" width="10">
+        </a-plane>
+        <a-plane id="wall-3" rotation="0 -90 0" position="5 0.5 0" material="src: #wallText;" height="1" width="10">
+        </a-plane>
+
+<!--         <a-plane id="arrow" height="0.15" width="0.15" material="src: #arrowTexture; transparent: true;"
+            position="0.3 1.6 -1.1"
+            animation="property: material.opacity; dir: alternate; from: 0.66; to: 0.2; dur: 500; loop: true;"
+            visible="false">
+        </a-plane> -->
+
+<!--         <a-entity id="rig" position="0 0 0">
+            <a-entity id="camera" camera position="0 1.6 0" look-controls="pointerLockEnabled: true"
+                wasd-controls="acceleration:150; fly: false; enabled: true">
+            </a-entity>
+        </a-entity>
+
+        <a-entity id="example" orbi="dimension: 2 2; orbits: 1 1.25 1.5; theta: 0; gap: 0.01 0.01; buttonSize: 0.2 0.2; border: 1 #f2f2f2; transparency: true;
+            font: roboto-msdf.json; negate: false;">
+        </a-entity>
+
+        <a-entity orbi="dimension: 1 1; orbits: 1.25; theta: 30; sideTextRotation: -30; gap: 0.01 0.01; buttonSize: 0.2 0.2; border: 1 #f2f2f2; transparency: true;
+            font: roboto-msdf.json; negate: false; sideTextSize: 0.32 3" config>
+        </a-entity> -->
+
+    </a-scene>
+
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
+    <form name="gform" id="gform" style="display: none;"
+        action="https://docs.google.com/forms/d/e/1FAIpQLSeiWQ0Fj772iYF2E5jtfZwNMyHJdALsS29X9nGJaj9zmjQCcQ/formResponse?"
+        target="hidden_iframe">
+        <input id="d1" type="number" name="entry.945692379">
+        <input id="t1" type="number" name="entry.812011754">
+
+        <input id="d2" type="number" name="entry.1617144705">
+        <input id="t2" type="number" name="entry.935117981">
+
+        <input id="d3" type="number" name="entry.1560648649">
+        <input id="t3" type="number" name="entry.686162974">
+    </form>
+</body>
+
+</html>
